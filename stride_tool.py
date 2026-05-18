@@ -3,9 +3,10 @@ import subprocess
 import os
 from typing import Optional, List, Dict
 
-from config import COIL_TAIL_MAX_LEN
+import config as cfg
 
-STRIDE_BIN = "./stride"
+
+STRIDE_BIN = cfg.STRIDE_BIN
 
 
 def run_stride(pdb_path: str) -> Optional[str]:
@@ -103,7 +104,7 @@ def get_motif_ss_stats(
     elements: List[Dict],
     motif_start: int,
     motif_end: int,
-    coil_tail_max_len: int = COIL_TAIL_MAX_LEN,
+    coil_tail_max_len: int = cfg.COIL_TAIL_MAX_LEN,
 ) -> Dict[str, int]:
     """
     Фильтрует SS-элементы, полностью входящие в [motif_start, motif_end].

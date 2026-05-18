@@ -1,29 +1,49 @@
 import os
 
-# Пути
-PDB_DIR = "/home/gluck/mnt/pdb/"         # корень архива PDB
-DATA_FILE = "data/data_SORTED.csv"                  # входной файл
-RESULTS_DIR = "/home/gluck/enrich/data/results/"                       # выходная папка для JSON
-TEMP_DIR = "/home/gluck/ramdisk/dbenrich26/"                       # временные PDB-фрагменты
-UNIPROT_CACHE_DIR = "/home/gluck/meta/uniprot/"     # кэш UniProt
 
-# Управление обработкой
-START_INDEX = 0            # индекс строки, с которой начинать
-STOP_INDEX = 10000          # индекс строки, на которой останавливаться (None = до конца)
-ONLY_NOT_PROCESSED = True  # пропускать уже обработанные (по наличию JSON)
-STOP_ON_ERROR = False      # True = падаем при ошибке; False = логируем и продолжаем
+def _env_int(key: str, default: int) -> int:
+    val = os.environ.get(key, '')
+    return int(val) if val else default
 
-# Параметры обработки
-NUM_WORKERS = None         # None = os.cpu_count()
-MISSING_RESIDUE_THRESHOLD = 0.10  # лимит пропущенных residue (10%)
-COIL_TAIL_MAX_LEN = 3      # coil на конце <= этой длины считается "хвостом" и не учитывается
 
-# Водородные связи: добавление атомов водорода перед расчётом
-ADD_HYDROGENS = True       # True = добавлять H через obabel перед calcHydrogenBonds
-OBABEL_BIN = "obabel"     # путь к бинарнику obabel (или просто "obabel" если в PATH)
+def _env_float(key: str, default: float) -> float:
+    val = os.environ.get(key, '')
+    return float(val) if val else default
 
-# Параметры агрегатора
-AGGREGATOR_START_INDEX = 0
-AGGREGATOR_STOP_INDEX = None
 
-# Кириллица допускается в комментариях
+def _env_bool(key: str, default: bool) -> bool:
+    val = os.environ.get(key, '').lower()
+    if val in ('1', 'true', 'yes'):
+        return True
+    if val in ('0', 'false', 'no'):
+        return False
+    return default
+
+
+def _env_optional_int(key: str) -> int | None:
+    val = os.environ.get(key, '')
+    return int(val) if val else None
+
+
+PDB_DIR            = os.environ.get('PDB_DIR',            '/home/gluck/mnt/pdb/')
+DATA_FILE           = os.environ.get('DATA_FILE',           'data/data_SORTED.csv')
+RESULTS_DIR         = os.environ.get('RESULTS_DIR',         '/home/gluck/enrich/data/results/')
+TEMP_DIR            = os.environ.get('TEMP_DIR',            '/home/gluck/ramdisk/dbenrich26/')
+UNIPROT_CACHE_DIR   = os.environ.get('UNIPROT_CACHE_DIR',   '/home/gluck/meta/uniprot/')
+
+START_INDEX         = _env_int('START_INDEX',          0)
+STOP_INDEX          = _env_optional_int('STOP_INDEX')
+ONLY_NOT_PROCESSED  = _env_bool('ONLY_NOT_PROCESSED',  True)
+STOP_ON_ERROR       = _env_bool('STOP_ON_ERROR',       False)
+
+NUM_WORKERS             = _env_optional_int('NUM_WORKERS')
+MISSING_RESIDUE_THRESHOLD = _env_float('MISSING_RESIDUE_THRESHOLD', 0.10)
+COIL_TAIL_MAX_LEN        = _env_int('COIL_TAIL_MAX_LEN', 3)
+
+ADD_HYDROGENS  = _env_bool('ADD_HYDROGENS', True)
+OBABEL_BIN     = os.environ.get('OBABEL_BIN', 'obabel')
+
+STRIDE_BIN     = os.environ.get('STRIDE_BIN', './stride')
+
+AGGREGATOR_START_INDEX = _env_int('AGGREGATOR_START_INDEX', 0)
+AGGREGATOR_STOP_INDEX  = _env_optional_int('AGGREGATOR_STOP_INDEX')
