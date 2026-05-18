@@ -20,7 +20,7 @@ from structure_tool import (
 from stride_tool import run_stride, parse_stride_output, get_secondary_structure_elements, get_motif_ss_stats
 from sasa_tool import calc_sasa_isolated, calc_sasa_in_chain, calc_surface_k
 from interactions_tool import calc_interactions
-from uniprot_tool import init_uniprot, get_uniprot_data, enrich_with_partners_and_sites
+from uniprot_tool import init_uniprot, get_uniprot_data, enrich_binding_sites
 
 # ─── Логирование ─────────────────────────────────────────────────────────────
 
@@ -264,9 +264,8 @@ def process_experiment_group(args: Tuple[str, List[Dict], List[int]]) -> None:
             up_data = get_uniprot_data(uniprot_id)
             if up_data is not None:
                 try:
-                    up_data = enrich_with_partners_and_sites(
-                        up_data, experiment_id, chain_id,
-                        uniprot_id, motif_start, motif_end,
+                    up_data = enrich_binding_sites(
+                        up_data, uniprot_id, motif_start, motif_end,
                     )
                 except Exception as e:
                     logging.warning(f"UniProt enrichment failed for {apfid}: {e}")

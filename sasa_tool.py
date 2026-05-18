@@ -30,7 +30,7 @@ def calc_sasa_isolated(motif_residues: List[Residue]) -> float:
     Возвращает суммарную SASA в Å².
     """
     tmp_struct = _build_single_chain_structure(motif_residues)
-    result = freesasa.calcBioPDB(tmp_struct)
+    result, _ = freesasa.calcBioPDB(tmp_struct)
     return result.totalArea()
 
 
@@ -43,15 +43,16 @@ def calc_sasa_in_chain(chain, motif_residue_ids: List[int]) -> float:
     # Собираем структуру из всей цепи
     all_residues = list(chain)
     tmp_struct = _build_single_chain_structure(all_residues)
-    result = freesasa.calcBioPDB(tmp_struct)
+    result, _ = freesasa.calcBioPDB(tmp_struct)
 
-    # Суммируем SASA только по атомам нужных остатков
-    target = set(motif_residue_ids)
+    # Суммируем SASA только по остаткам мотива
+    # residueAreas() возвращает {chain_id: {resnum_str: ResidueArea}}
+    target = set(str(r) for r in motif_residue_ids)
     total = 0.0
-    for atom_result in result.atoms():
-        # atom_result имеет атрибуты: residueNum, area
-        if atom_result.residueNum in target:
-            total += atom_result.area
+    for chain_areas in result.residueAreas().values():
+        for resnum_str, res_area in chain_areas.items():
+            if resnum_str in target:
+                total += res_area.total
     return total
 
 

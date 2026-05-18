@@ -115,9 +115,9 @@
 
 ## ЗАДАЧА 6: `uniprot_tool.py`
 
-**Файл:** `uniprot_tool.py` — 156 строк
+**Файл:** `uniprot_tool.py` — 156 строк → 90 строк (после рефакторинга)
 
-### Функции:
+### Функции (оригинал):
 
 | Функция | Описание |
 |---------|----------|
@@ -194,4 +194,41 @@ dbenrich26/
     └── results/            # создаётся автоматически
 ```
 
-**Всего:** 1203 строки Python-кода, 8 новых файлов.
+**Всего:** 1137 строк Python-кода, 8 новых файлов.
+
+---
+
+## Исправление: удаление PDB API из `uniprot_tool.py`
+
+**Дата:** 2026-05-18  
+**Причина:** `ModuleNotFoundError: No module named 'get_pdb_api_data'` — модуль `get_pdb_api_data` (и `apfid`) не существовал в проекте.
+
+### Что изменилось
+
+#### `uniprot_tool.py` — 156 → 90 строк (-66 строк)
+
+**Удалено:**
+- `from get_pdb_api_data import get_single` — несуществующий модуль
+- `from apfid import Apfid` — несуществующий модуль
+- `import jmespath` — нужен был только для PDB API
+- Константа `DATA_PLAIN` — JMESPath-запрос к PDB API
+- Функция `enrich_with_partners_and_sites()` — 170 строк, вся логика получения партнёров через `Apfid` + `get_single` + `jmespath`
+
+**Добавлено:**
+- Функция `enrich_binding_sites(up_data, uniprot_id, motif_start, motif_end)`:
+  - Только сайты связывания через `UniprotData.get_position_features()`
+  - `protein_partners` всегда устанавливается в `''` (PDB API не используется)
+  - Сигнатура проще: не требует `experiment_id` и `chain_id`
+
+#### `processor.py` — косметические правки
+- Импорт: `enrich_with_partners_and_sites` → `enrich_binding_sites`
+- Вызов: убраны параметры `experiment_id, chain_id`
+
+**Не затронуто:** логика сайтов связывания (`has_binding_sites`, `binding_sites`) — осталась без изменений, используется тот же `UniprotData.get_position_features()`.
+
+### Изменение метрик
+| Параметр | До | После |
+|---|---|---|
+| `uniprot_tool.py` | 156 строк | 90 строк |
+| Всего кода | 1203 строки | 1137 строк |
+| Файлов | 8 | 8 |
