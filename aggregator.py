@@ -105,6 +105,8 @@ def main():
                 incorrect_count += 1
 
             else:
+                print(correct_path)
+                print(incorrect_path)
                 skipped_count += 1
 
     # Закрываем файлы

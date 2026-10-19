@@ -27,7 +27,7 @@ def _env_optional_int(key: str) -> int | None:
 
 PDB_DIR            = os.environ.get('PDB_DIR',            '/home/gluck/mnt/pdb/')
 DATA_FILE           = os.environ.get('DATA_FILE',           'data/data_SORTED.csv')
-RESULTS_DIR         = os.environ.get('RESULTS_DIR',         '/home/gluck/enrich/data/results/')
+RESULTS_DIR         = os.environ.get('RESULTS_DIR',         '/home/gluck/enrich/ext_result/results/')
 TEMP_DIR            = os.environ.get('TEMP_DIR',            '/home/gluck/ramdisk/dbenrich26/')
 UNIPROT_CACHE_DIR   = os.environ.get('UNIPROT_CACHE_DIR',   '/home/gluck/meta/uniprot/')
 
@@ -45,5 +45,5 @@ OBABEL_BIN     = os.environ.get('OBABEL_BIN', 'obabel')
 
 STRIDE_BIN     = os.environ.get('STRIDE_BIN', './stride')
 
-AGGREGATOR_START_INDEX = _env_int('AGGREGATOR_START_INDEX', 0)
-AGGREGATOR_STOP_INDEX  = _env_optional_int('AGGREGATOR_STOP_INDEX')
+AGGREGATOR_START_INDEX = _env_int('AGGREGATOR_START_INDEX', 1000000)
+AGGREGATOR_STOP_INDEX  = _env_int('AGGREGATOR_STOP_INDEX', 1300000)
